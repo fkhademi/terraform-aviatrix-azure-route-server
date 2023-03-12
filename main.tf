@@ -71,9 +71,9 @@ resource "azurerm_virtual_network_gateway" "default" {
 
   ip_configuration {
     name                          = "vnetGatewayConfig"
-    public_ip_address_id          = azurerm_public_ip.vng.id
+    public_ip_address_id          = azurerm_public_ip.vng[0].id
     private_ip_address_allocation = "Dynamic"
-    subnet_id                     = azurerm_subnet.vng.id
+    subnet_id                     = azurerm_subnet.vng[0].id
   }
 }
 
