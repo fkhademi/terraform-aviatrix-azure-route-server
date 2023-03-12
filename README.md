@@ -55,6 +55,7 @@ The following variables are optional:
 key | default | value 
 :---|:---|:---
 enable_bgp_peering | true | Toggle to enable/disable BGP peering between the Aviatrix transit and Azure route server. E.g. for migration scenario's.
+enable_vng_deployment | true | Toggle to enable/disable VNG deployment.
 [enable_learned_cidrs_approval](https://registry.terraform.io/providers/AviatrixSystems/aviatrix/latest/docs/resources/aviatrix_transit_external_device_conn#enable_learned_cidrs_approval) | null | Enable learned CIDRs approval for the connection. 
 lan_interface_index | 0 | Determines which LAN interface will be used for terminating the BGP peering. Uses the first BGP interface by default (0)
 network_domain | | Network domain used for segmentation.
@@ -63,6 +64,8 @@ resource_group_name | | Resource group name, in case you want to use an existing
 vng_sku | Standard | SKU to use to deploy the VNG.
 route_server_subnet | | If provided, this is the subnet CIDR that will be used for the route server subnet.
 vng_subnet | | If provided, this is the subnet CIDR that will be used for the VNG subnet.
+ars_vnet_name | | If provided, VNET name for ARS.
+ars_subnet_id | | If provided, this is the subnet ID that will be used for the ARS.
 
 ### Outputs
 This module will return the following outputs:

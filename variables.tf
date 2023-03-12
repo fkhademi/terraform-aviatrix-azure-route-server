@@ -6,16 +6,7 @@ variable "name" {
 variable "cidr" {
   description = "CIDR for VNET creation."
   type        = string
-
-  validation {
-    condition     = can(cidrnetmask(var.cidr))
-    error_message = "This does not like a valid CIDR."
-  }
-
-  validation {
-    condition     = split("/", var.cidr)[1] <= 26
-    error_message = "CIDR size too small. Needs to be at least a /26."
-  }
+  default     = ""
 }
 
 variable "route_server_subnet" {
