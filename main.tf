@@ -21,7 +21,7 @@ resource "azurerm_subnet" "ars" {
   name                 = "RouteServerSubnet"
   virtual_network_name = local.ars_vnet_name.name
   resource_group_name  = local.resource_group_name
-  address_prefixes     = length(var.route_server_subnet) > 0 ? [var.route_server_subnet] : [cidrsubnet(var.cidr, 1, 1)]
+  address_prefixes     = var.route_server_subnet
 }
 
 resource "azurerm_public_ip" "ars" {
@@ -82,14 +82,14 @@ resource "azurerm_virtual_network_peering" "default-1" {
   name                      = format("%s-peertransittoars", var.name)
   resource_group_name       = local.transit_resource_group
   virtual_network_name      = local.transit_vnet_name
-  remote_virtual_network_id = local.ars_vnet_name.id
+  remote_virtual_network_id = local.ars_vnet_id
   use_remote_gateways       = true
 }
 
 resource "azurerm_virtual_network_peering" "default-2" {
   name                      = format("%s-peerarstotransit", var.name)
   resource_group_name       = local.resource_group_name
-  virtual_network_name      = local.ars_vnet_name.name
+  virtual_network_name      = local.ars_vnet_name.id
   remote_virtual_network_id = local.transit_resource_group_id
   allow_gateway_transit     = true
 }

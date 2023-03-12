@@ -13,16 +13,6 @@ variable "route_server_subnet" {
   description = "If provided, this is the subnet CIDR that will be used for the route server subnet."
   type        = string
   default     = ""
-
-  validation {
-    condition     = var.route_server_subnet != "" ? can(cidrnetmask(var.route_server_subnet)) : true
-    error_message = "This does not like a valid CIDR."
-  }
-
-  validation {
-    condition     = var.route_server_subnet != "" ? split("/", var.route_server_subnet)[1] <= 27 : true
-    error_message = "CIDR size too small. Needs to be at least a /27."
-  }
 }
 
 variable "vng_subnet" {
@@ -58,6 +48,13 @@ variable "resource_group_name" {
 
 variable "ars_vnet_name" {
   description = "ARS VNET name, in case you want to use an existing VNET for ARS."
+  type        = string
+  default     = ""
+  nullable    = false
+}
+
+variable "ars_vnet_id" {
+  description = "ARS VNET ID, in case you want to use an existing VNET for ARS."
   type        = string
   default     = ""
   nullable    = false
@@ -123,6 +120,7 @@ locals {
   existing_ars_subnet       = length(var.ars_subnet_id) > 0
   resource_group_name       = local.existing_resource_group ? var.resource_group_name : azurerm_resource_group.default[0].name
   ars_vnet_name             = local.existing_ars_vnet ? var.ars_vnet_name : azurerm_virtual_network.default[0].name
+  ars_vnet_id               = local.existing_ars_vnet ? var.ars_vnet_id : azurerm_virtual_network.default[0].id
   ars_subnet_id             = local.existing_ars_subnet ? var.ars_subnet_id : azurerm_subnet.ars[0].id
   region                    = var.transit_vnet_obj.region
   transit_vnet_id           = var.transit_vnet_obj.vpc_id
