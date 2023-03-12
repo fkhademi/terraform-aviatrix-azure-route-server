@@ -122,8 +122,8 @@ locals {
   existing_ars_vnet         = length(var.ars_vnet_name) > 0
   existing_ars_subnet       = length(var.ars_subnet_id) > 0
   resource_group_name       = local.existing_resource_group ? var.resource_group_name : azurerm_resource_group.default[0].name
-  ars_vnet_name             = local.existing_ars_vnet ? var.ars_vnet_name : azurerm_virtual_network.default.name
-  ars_subnet_id             = local.existing_ars_subnet ? var.ars_subnet_id : azurerm_subnet.ars.id
+  ars_vnet_name             = local.existing_ars_vnet ? var.ars_vnet_name : azurerm_virtual_network.default[0].name
+  ars_subnet_id             = local.existing_ars_subnet ? var.ars_subnet_id : azurerm_subnet.ars[0].id
   region                    = var.transit_vnet_obj.region
   transit_vnet_id           = var.transit_vnet_obj.vpc_id
   transit_vnet_name         = var.transit_vnet_obj.name
