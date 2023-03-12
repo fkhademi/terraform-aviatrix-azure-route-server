@@ -65,6 +65,20 @@ variable "resource_group_name" {
   nullable    = false
 }
 
+variable "ars_vnet_name" {
+  description = "ARS VNET name, in case you want to use an existing VNET for ARS."
+  type        = string
+  default     = ""
+  nullable    = false
+}
+
+variable "ars_subnet_id" {
+  description = "ARS Subnet ID, in case you want to use an existing subnet for ARS."
+  type        = string
+  default     = ""
+  nullable    = false
+}
+
 variable "network_domain" {
   description = "Network domain used for segmentation"
   type        = string
@@ -86,6 +100,14 @@ variable "lan_interface_index" {
   nullable    = false
 }
 
+variable "enable_vng_deployment" {
+  description = "Toggle to enable/disable deployment in the VNG."
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+
 variable "enable_bgp_peering" {
   description = "Toggle to enable/disable BGP peering between the Aviatrix transit and Azure route server. E.g. for migration scenario's."
   type        = bool
@@ -106,7 +128,11 @@ variable "manual_bgp_advertised_cidrs" {
 
 locals {
   existing_resource_group   = length(var.resource_group_name) > 0
+  existing_ars_vnet         = length(var.ars_vnet_name) > 0
+  existing_ars_subnet       = length(var.ars_subnet_id) > 0
   resource_group_name       = local.existing_resource_group ? var.resource_group_name : azurerm_resource_group.default[0].name
+  ars_vnet_name             = local.existing_ars_vnet ? var.ars_vnet_name : azurerm_virtual_network.default.name
+  ars_subnet_id             = local.existing_ars_subnet ? var.ars_subnet_id : azurerm_subnet.ars.id
   region                    = var.transit_vnet_obj.region
   transit_vnet_id           = var.transit_vnet_obj.vpc_id
   transit_vnet_name         = var.transit_vnet_obj.name

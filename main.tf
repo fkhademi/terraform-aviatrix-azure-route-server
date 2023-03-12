@@ -8,6 +8,7 @@ resource "azurerm_resource_group" "default" {
 }
 
 resource "azurerm_virtual_network" "default" {
+  count               = local.existing_ars_vnet ? 0 : 1
   name                = format("%s-ars-vnet", var.name)
   address_space       = [var.cidr]
   resource_group_name = local.resource_group_name
@@ -16,8 +17,9 @@ resource "azurerm_virtual_network" "default" {
 
 #Azure Route Server resources
 resource "azurerm_subnet" "ars" {
+  count                = local.existing_ars_subnet ? 0 : 1
   name                 = "RouteServerSubnet"
-  virtual_network_name = azurerm_virtual_network.default.name
+  virtual_network_name = local.ars_vnet_name.name
   resource_group_name  = local.resource_group_name
   address_prefixes     = length(var.route_server_subnet) > 0 ? [var.route_server_subnet] : [cidrsubnet(var.cidr, 1, 1)]
 }
@@ -36,12 +38,13 @@ resource "azurerm_route_server" "default" {
   location                         = local.region
   sku                              = "Standard"
   public_ip_address_id             = azurerm_public_ip.ars.id
-  subnet_id                        = azurerm_subnet.ars.id
+  subnet_id                        = local.ars_subnet_id
   branch_to_branch_traffic_enabled = true
 }
 
 #VNG Resources
 resource "azurerm_public_ip" "vng" {
+  count               = var.enable_vng_deployment ? 1 : 0
   name                = format("%s-vng-pip", var.name)
   resource_group_name = local.resource_group_name
   location            = local.region
@@ -50,13 +53,15 @@ resource "azurerm_public_ip" "vng" {
 }
 
 resource "azurerm_subnet" "vng" {
+  count                = var.enable_vng_deployment ? 1 : 0
   name                 = "GatewaySubnet"
-  virtual_network_name = azurerm_virtual_network.default.name
+  virtual_network_name = local.ars_vnet_name.name
   resource_group_name  = local.resource_group_name
   address_prefixes     = length(var.vng_subnet) > 0 ? [var.vng_subnet] : [cidrsubnet(var.cidr, 1, 0)]
 }
 
 resource "azurerm_virtual_network_gateway" "default" {
+  count               = var.enable_vng_deployment ? 1 : 0
   name                = format("%s-vng", var.name)
   location            = local.region
   resource_group_name = local.resource_group_name
@@ -77,24 +82,16 @@ resource "azurerm_virtual_network_peering" "default-1" {
   name                      = format("%s-peertransittoars", var.name)
   resource_group_name       = local.transit_resource_group
   virtual_network_name      = local.transit_vnet_name
-  remote_virtual_network_id = azurerm_virtual_network.default.id
+  remote_virtual_network_id = local.ars_vnet_name.id
   use_remote_gateways       = true
-
-  depends_on = [
-    azurerm_virtual_network_gateway.default
-  ]
 }
 
 resource "azurerm_virtual_network_peering" "default-2" {
   name                      = format("%s-peerarstotransit", var.name)
   resource_group_name       = local.resource_group_name
-  virtual_network_name      = azurerm_virtual_network.default.name
+  virtual_network_name      = local.ars_vnet_name.name
   remote_virtual_network_id = local.transit_resource_group_id
   allow_gateway_transit     = true
-
-  depends_on = [
-    azurerm_virtual_network_gateway.default
-  ]
 }
 
 resource "azurerm_route_server_bgp_connection" "transit_gw" {
@@ -120,7 +117,7 @@ resource "aviatrix_transit_external_device_conn" "default" {
   gw_name                       = local.transit_gateway_name
   connection_type               = "bgp"
   tunnel_protocol               = "LAN"
-  remote_vpc_name               = format("%s:%s:%s", azurerm_virtual_network.default.name, local.resource_group_name, data.azurerm_subscription.current.subscription_id)
+  remote_vpc_name               = format("%s:%s:%s", local.ars_vnet_name.name, local.resource_group_name, data.azurerm_subscription.current.subscription_id)
   ha_enabled                    = true
   bgp_local_as_num              = local.transit_as_number
   bgp_remote_as_num             = "65515"
