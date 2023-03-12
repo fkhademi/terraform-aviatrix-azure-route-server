@@ -21,7 +21,7 @@ resource "azurerm_subnet" "ars" {
   name                 = "RouteServerSubnet"
   virtual_network_name = local.ars_vnet_name.name
   resource_group_name  = local.resource_group_name
-  address_prefixes     = var.route_server_subnet
+  address_prefixes     = [var.route_server_subnet]
 }
 
 resource "azurerm_public_ip" "ars" {
