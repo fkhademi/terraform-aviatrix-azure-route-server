@@ -32,7 +32,7 @@ resource "azurerm_virtual_network_peering" "default-1" {
 resource "azurerm_virtual_network_peering" "default-2" {
   name                      = format("%s-peerarstotransit", var.name)
   resource_group_name       = var.resource_group_name
-  virtual_network_name      = var.ars_vnet_id
+  virtual_network_name      = var.ars_vnet_name
   remote_virtual_network_id = local.transit_resource_group_id
   allow_gateway_transit     = true
 }
