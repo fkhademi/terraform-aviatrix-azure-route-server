@@ -60,7 +60,7 @@ resource "aviatrix_transit_external_device_conn" "default" {
   gw_name                       = local.transit_gateway_name
   connection_type               = "bgp"
   tunnel_protocol               = "LAN"
-  remote_vpc_name               = format("%s:%s:%s", var.ars_vnet_id, var.resource_group_name, data.azurerm_subscription.current.subscription_id)
+  remote_vpc_name               = format("%s:%s:%s", var.ars_vnet_name, var.resource_group_name, data.azurerm_subscription.current.subscription_id)
   ha_enabled                    = true
   bgp_local_as_num              = local.transit_as_number
   bgp_remote_as_num             = "65515"
