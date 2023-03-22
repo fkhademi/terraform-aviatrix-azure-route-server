@@ -26,7 +26,7 @@ resource "azurerm_virtual_network_peering" "default-1" {
   resource_group_name       = local.transit_resource_group
   virtual_network_name      = local.transit_vnet_name
   remote_virtual_network_id = var.ars_vnet_id
-  use_remote_gateways       = true
+  use_remote_gateways       = false
 }
 
 resource "azurerm_virtual_network_peering" "default-2" {
@@ -34,7 +34,7 @@ resource "azurerm_virtual_network_peering" "default-2" {
   resource_group_name       = var.resource_group_name
   virtual_network_name      = var.ars_vnet_name
   remote_virtual_network_id = local.transit_resource_group_id
-  allow_gateway_transit     = true
+  allow_gateway_transit     = false
 }
 
 resource "azurerm_route_server_bgp_connection" "transit_gw" {
